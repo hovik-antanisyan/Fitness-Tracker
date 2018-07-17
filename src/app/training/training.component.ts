@@ -10,12 +10,13 @@ import { Exercise } from './exercise.model';
 export class TrainingComponent implements OnInit {
   ongoingTraining: boolean;
 
-  constructor(private training: TrainingService) { }
+  constructor(private training: TrainingService) {
+  }
 
   ngOnInit() {
     this.training.exerciseStarted
       .subscribe((exercise: Exercise) => {
-          this.ongoingTraining = exercise !== null;
+        this.ongoingTraining = exercise !== null;
       });
   }
 

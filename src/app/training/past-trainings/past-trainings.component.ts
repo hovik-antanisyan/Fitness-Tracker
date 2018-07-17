@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
-import {Exercise} from '../exercise.model';
-import {TrainingService} from '../training.service';
+import { Exercise } from '../exercise.model';
+import { TrainingService } from '../training.service';
 
 @Component({
   selector: 'app-past-trainings',
@@ -11,13 +11,19 @@ import {TrainingService} from '../training.service';
 export class PastTrainingsComponent implements OnInit, AfterViewInit {
   displayedColumns = ['date', 'name', 'calories', 'duration', 'state'];
   dataSource = new MatTableDataSource<Exercise>();
-  @ViewChild(MatSort)sort: MatSort;
-  @ViewChild(MatPaginator)paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private trainingService: TrainingService) { }
+  constructor(private trainingService: TrainingService) {
+  }
 
   ngOnInit() {
-    this.dataSource.data = this.trainingService.getPastExercises();
+    this.trainingService.fetchFinishedExercises();
+    this.trainingService.finishedExerciseStarted
+      .subscribe((exercises: Exercise[]) => {
+        console.log(exercises);
+        this.dataSource.data = exercises;
+      });
   }
 
   ngAfterViewInit() {
