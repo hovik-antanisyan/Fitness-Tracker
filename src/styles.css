@@ -9,3 +9,7 @@ html, body {
 body {
     margin: 0;
 }
+
+snack-bar-container.error {
+    background-color: #ff0f00;
+}

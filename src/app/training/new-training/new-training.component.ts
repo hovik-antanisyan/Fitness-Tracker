@@ -1,31 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Exercise } from '../exercise.model';
 import { TrainingService } from '../training.service';
-import { AngularFirestore } from 'angularfire2/firestore';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/internal/operators';
+import { UiService } from '../../ui.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-new-training',
   templateUrl: './new-training.component.html',
   styleUrls: ['./new-training.component.css']
 })
-export class NewTrainingComponent implements OnInit {
+export class NewTrainingComponent implements OnInit, OnDestroy {
   exercises: any;
+  selectedExercise = null;
+  loading = false;
+  private uiSubscription: Subscription;
 
-  constructor(private trainingService: TrainingService, private db: AngularFirestore) {
+  constructor(private trainingService: TrainingService, private uiService: UiService) {
   }
 
   ngOnInit() {
-    this.trainingService.fetchAvailableExercises();
     this.trainingService.exercisesChanged
-      .subscribe((exercises: Exercise[]) => {
-        this.exercises = exercises;
-      });
+      .subscribe(
+        (exercises: Exercise[]) => {
+          this.exercises = exercises;
+        }
+      );
+    this.uiSubscription = this.uiService.loadingStateChange
+      .subscribe(isLoading => this.loading = isLoading);
+    this.fetchExercises();
+  }
+
+  fetchExercises() {
+    this.trainingService.fetchAvailableExercises();
   }
 
   onStart(id: string) {
     this.trainingService.startExercise(id);
+  }
+
+  ngOnDestroy() {
+    this.uiSubscription.unsubscribe();
   }
 
 }

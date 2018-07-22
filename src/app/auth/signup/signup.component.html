@@ -60,6 +60,7 @@
             </mat-checkbox>
             <mat-error *ngIf="agreeInput.hasError('required') && agreeInput.dirty">You must be agree to terms and conditions.</mat-error>
         </div>
-        <button mat-raised-button type="submit" color="primary" [disabled]="!f.valid">Submit</button>
+        <button *ngIf="!loading" mat-raised-button type="submit" color="primary" [disabled]="!f.valid">Submit</button>
+        <mat-spinner *ngIf="loading"></mat-spinner>
     </form>
 </section>
