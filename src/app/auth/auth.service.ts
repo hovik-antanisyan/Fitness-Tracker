@@ -2,9 +2,13 @@ import { AuthData } from './auth-data.model';
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import {Store} from '@ngrx/store';
 import { AngularFireAuth } from 'angularfire2/auth';
+
 import { TrainingService } from '../training/training.service';
 import { UiService } from '../ui.service';
+import * as fromRoot from '../app.reducers';
+import * as UI from '../shared/ui.actions';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +19,8 @@ export class AuthService {
     private router: Router,
     private afAuth: AngularFireAuth,
     private trainingService: TrainingService,
-    private uiService: UiService) {
+    private uiService: UiService,
+    private store: Store<fromRoot.State>) {
   }
 
   initAuthListener() {
@@ -35,14 +40,14 @@ export class AuthService {
   }
 
   register(authData: AuthData) {
-    this.uiService.loadingStateChange.next(true);
+    this.store.dispatch(new UI.StartLoading());
     this.afAuth.auth.createUserAndRetrieveDataWithEmailAndPassword(authData.email, authData.password)
       .then((result: any) => {
         console.log(result);
-        this.uiService.loadingStateChange.next(false);
+          this.store.dispatch(new UI.StopLoading());
       })
       .catch((error: any) => {
-        this.uiService.loadingStateChange.next(false);
+          this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackBar(
           error.message, null,
           {
@@ -55,14 +60,14 @@ export class AuthService {
   }
 
   login(authData: AuthData) {
-    this.uiService.loadingStateChange.next(true);
+      this.store.dispatch(new UI.StartLoading());
     this.afAuth.auth.signInWithEmailAndPassword(authData.email, authData.password)
       .then((result: any) => {
         console.log(result);
-        this.uiService.loadingStateChange.next(false);
+        this.store.dispatch(new UI.StopLoading());
       })
       .catch((error: any) => {
-        this.uiService.loadingStateChange.next(false);
+        this.store.dispatch(new UI.StopLoading());
         this.uiService.showSnackBar(
           error.message, null,
           {
