@@ -1,5 +1,4 @@
 import { AuthData } from './auth-data.model';
-import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import {Store} from '@ngrx/store';
@@ -9,11 +8,10 @@ import { TrainingService } from '../training/training.service';
 import { UiService } from '../ui.service';
 import * as fromRoot from '../app.reducers';
 import * as UI from '../shared/ui.actions';
+import * as Auth from './auth.actions';
 
 @Injectable()
 export class AuthService {
-  authChanged = new Subject<boolean>();
-  private isAuthenticated = false;
 
   constructor(
     private router: Router,
@@ -27,13 +25,11 @@ export class AuthService {
     this.afAuth.authState
       .subscribe((user) => {
         if (user) {
-          this.isAuthenticated = true;
-          this.authChanged.next(true);
+          this.store.dispatch(new Auth.SetAuthenticated());
           this.router.navigateByUrl('/training');
         } else {
-          this.isAuthenticated = false;
+          this.store.dispatch(new Auth.SetUnauthenticated());
           this.trainingService.cancelSubscriptions();
-          this.authChanged.next(false);
           this.router.navigateByUrl('login');
         }
       });
@@ -81,10 +77,6 @@ export class AuthService {
 
   logout() {
     this.afAuth.auth.signOut();
-  }
-
-  isAuth() {
-    return this.isAuthenticated;
   }
 
 }

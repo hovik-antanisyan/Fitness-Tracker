@@ -9,9 +9,9 @@
   </div>
   <div id="spacer" fxFlex></div>
   <div fxHide.xs>
-    <a *ngIf="!isAuth" routerLink="/signup" mat-button>Signup</a>
-    <a *ngIf="!isAuth" routerLink="/login" mat-button>Login</a>
-    <a *ngIf="isAuth" routerLink="/training" mat-button>Training</a>
-    <a *ngIf="isAuth" href="#" (click)="onLogout($event)" mat-button>Logout</a>
+    <a *ngIf="!(isAuth$ | async)" routerLink="/signup" mat-button>Signup</a>
+    <a *ngIf="!(isAuth$ | async)" routerLink="/login" mat-button>Login</a>
+    <a *ngIf="isAuth$ | async" routerLink="/training" mat-button>Training</a>
+    <a *ngIf="isAuth$ | async" href="#" (click)="onLogout($event)" mat-button>Logout</a>
   </div>
 </mat-toolbar>
