@@ -32,9 +32,10 @@ export function trainingReducer(state = initialState, action: training.TrainingA
         finishedExercises: action.payload
       };
     case training.START_TRAINING:
+      const running_training = state.availableExercises.find(ex => ex.id === action.payload);
       return {
         ...state,
-        runningExercise: action.payload
+        runningExercise: {...running_training}
       };
     case training.STOP_TRAINING:
       return {
@@ -49,3 +50,4 @@ const getTrainingState = createFeatureSelector<TrainingState>('training');
 export const getAvailableExercises = createSelector(getTrainingState, (state: TrainingState) => state.availableExercises);
 export const getFinishedeExercises = createSelector(getTrainingState, (state: TrainingState) => state.finishedExercises);
 export const getRunningExercise = createSelector(getTrainingState, (state: TrainingState) => state.runningExercise);
+export const getIsRunningExercise = createSelector(getTrainingState, (state: TrainingState) => state ? state.runningExercise != null : false);

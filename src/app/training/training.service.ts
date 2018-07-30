@@ -11,7 +11,6 @@ import * as training from './training.actions';
 
 @Injectable()
 export class TrainingService {
-  private availableExercises: Exercise[];
   exercisesChanged = new Subject<Exercise[]>();
   exerciseStarted = new Subject<Exercise>();
   finishedExerciseStarted = new Subject<Exercise[]>();
@@ -40,8 +39,6 @@ export class TrainingService {
         (exercises: Exercise[]) => {
           this.store.dispatch(new training.FetchAvailableExercises(exercises));
           this.uiService.loadingStateChange.next(false);
-          this.availableExercises = exercises;
-          this.exercisesChanged.next([...this.availableExercises]);
         },
         error => {
           this.uiService.loadingStateChange.next(false);
@@ -64,7 +61,7 @@ export class TrainingService {
   }
 
   startExercise(id: string) {
-    this.activeExercise = this.availableExercises.find(ex => ex.id === id);
+    this.store.dispatch(new training.StartTraining(id));
     this.exerciseStarted.next({...this.activeExercise});
   }
 
@@ -73,25 +70,29 @@ export class TrainingService {
   }
 
   cancelExercise(progress: number) {
-    this.addExerciseToDB({
-      ...this.activeExercise,
-      calories: this.activeExercise.calories * (progress / 100),
-      duration: this.activeExercise.duration * (progress / 100),
-      date: new Date(),
-      state: 'canceled'
-    });
-    this.activeExercise = null;
-    this.exerciseStarted.next(null);
+    this.store.select(fromTraining.getRunningExercise)
+      .subscribe((exercise: Exercise) => {
+        this.addExerciseToDB({
+          ...exercise,
+          calories: exercise.calories * (progress / 100),
+          duration: exercise.duration * (progress / 100),
+          date: new Date(),
+          state: 'canceled'
+        });
+      });
+      this.store.dispatch(new training.StopTraining());
   }
 
   completeExercise() {
-    this.addExerciseToDB({
-      ...this.activeExercise,
-      date: new Date(),
-      state: 'completed'
-    });
-    this.activeExercise = null;
-    this.exerciseStarted.next(null);
+    this.store.select(fromTraining.getRunningExercise)
+      .subscribe((exercise: Exercise) => {
+        this.addExerciseToDB({
+          ...exercise,
+          date: new Date(),
+          state: 'canceled'
+        });
+        this.store.dispatch(new training.StopTraining());
+      });
   }
 
   private addExerciseToDB(exercise: Exercise) {
