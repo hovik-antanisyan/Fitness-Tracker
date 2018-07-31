@@ -10,7 +10,7 @@
         </mat-select>
       </mat-form-field>
     </mat-card-content>
-    <mat-card-actions *ngIf="!loading">
+    <mat-card-actions *ngIf="!(loading$ | async)">
       <button
           *ngIf="exercises$ | async"
           [disabled]="!selectedExercise"
@@ -19,6 +19,6 @@
       </button>
       <button *ngIf="!(exercises$ | async)" (click)="fetchExercises()" mat-raised-button>Fetch again</button>
     </mat-card-actions>
-    <mat-spinner *ngIf="loading"></mat-spinner>
+    <mat-spinner *ngIf="loading$ | async"></mat-spinner>
   </mat-card>
 </section>

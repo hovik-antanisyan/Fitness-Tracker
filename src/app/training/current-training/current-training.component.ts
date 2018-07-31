@@ -6,7 +6,7 @@ import { TrainingService } from '../training.service';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromTraining from '../training.reducer';
-import Timer = NodeJS.Timer;
+import { take } from 'rxjs/internal/operators';
 
 @Component({
   selector: 'app-current-training',
@@ -15,7 +15,7 @@ import Timer = NodeJS.Timer;
 })
 export class CurrentTrainingComponent implements OnInit {
   progress = 0;
-  progressInterval: Timer;
+  progressInterval: number;
   exercise: Exercise;
 
   constructor(private dialog: MatDialog, private trainingService: TrainingService, private store: Store<fromTraining.State>) {
@@ -23,6 +23,7 @@ export class CurrentTrainingComponent implements OnInit {
 
   ngOnInit() {
     this.store.select(fromTraining.getRunningExercise)
+      .pipe(take(1))
       .subscribe((ex: Exercise) => {
         this.exercise = ex;
         const step = this.exercise.duration / 100 * 1000;

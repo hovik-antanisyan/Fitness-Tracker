@@ -42,6 +42,8 @@ export function trainingReducer(state = initialState, action: training.TrainingA
         ...state,
         runningExercise: null
       };
+    default:
+      return state;
   }
 }
 
